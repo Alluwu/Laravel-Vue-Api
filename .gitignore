@@ -1,30 +1,49 @@
-/vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
+# Ignorar los archivos y directorios específicos de Laravel
+/laravel-api/vendor/
+/laravel-api/node_modules/
+/laravel-api/npm-debug.log
+/laravel-api/yarn-error.log
 
-# Laravel 4 specific
-bootstrap/compiled.php
-app/storage/
+# Laravel 4 específico
+/laravel-api/bootstrap/compiled.php
+/laravel-api/app/storage/
 
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
+# Laravel 5 y Lumen específico
+/laravel-api/public/storage
+/laravel-api/public/hot
 
-# Laravel 5 & Lumen specific with changed public path
-public_html/storage
-public_html/hot
+# Laravel 5 y Lumen específico con ruta pública modificada
+/laravel-api/public_html/storage
+/laravel-api/public_html/hot
 
-storage/*.key
-.env
-Homestead.yaml
-Homestead.json
-/.vagrant
-.phpunit.result.cache
+# Archivos y directorios sensibles de Laravel
+/laravel-api/storage/*.key
+/laravel-api/.env
+/laravel-api/Homestead.yaml
+/laravel-api/Homestead.json
+/laravel-api/.vagrant
+/laravel-api/.phpunit.result.cache
 
-/public/build
-/storage/pail
-.env.backup
-.env.production
-.phpactor.json
-auth.json
+# Archivos generados por la compilación y otros temporales de Laravel
+/laravel-api/public/build
+/laravel-api/storage/pail
+/laravel-api/.env.backup
+/laravel-api/.env.production
+/laravel-api/.phpactor.json
+/laravel-api/auth.json
+
+# Ignorar los archivos y directorios específicos de Vue.js
+/vuejs-taller-umg/node_modules/
+/vuejs-taller-umg/dist/
+/vuejs-taller-umg/.env
+/vuejs-taller-umg/.cache/
+/vuejs-taller-umg/yarn-error.log
+/vuejs-taller-umg/npm-debug.log
+
+# Directorios y archivos temporales generados por Vue.js
+/.vscode/
+/.idea/
+/.DS_Store
+
+# Ignorar el archivo .env en la raíz del proyecto
+/.env
