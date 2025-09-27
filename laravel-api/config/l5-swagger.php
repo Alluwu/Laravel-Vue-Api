@@ -2,6 +2,7 @@
 
 return [
     'default' => 'default',
+
     'documentations' => [
         'default' => [
             'api' => [
@@ -18,8 +19,10 @@ return [
                 'docs_json' => 'api-docs.json',
                 'docs_yaml' => 'api-docs.yaml',
                 'format_to_use_for_docs' => env('L5_FORMAT_TO_USE_FOR_DOCS', 'json'),
+
+                
                 'annotations' => [
-                    base_path('app'), // <-- Aquí van tus archivos con @OA\Info() y controllers
+                    base_path('app/Http/Controllers/Api'),
                 ],
             ],
         ],
@@ -43,13 +46,15 @@ return [
             'views' => base_path('resources/views/vendor/l5-swagger'),
             'base' => env('L5_SWAGGER_BASE_PATH', null),
             'excludes' => [],
+
+            
             'annotations' => [
-                base_path('app'),
+                base_path('app/Http/Controllers/Api'),
             ],
         ],
 
         'scanOptions' => [
-            'pattern' => '*.php', // <-- Forzamos escaneo de todos los PHP
+            'pattern' => '*.php',
             'exclude' => [],
             'open_api_spec_version' => env('L5_SWAGGER_OPEN_API_SPEC_VERSION', \L5Swagger\Generator::OPEN_API_DEFAULT_SPEC_VERSION),
         ],
@@ -59,7 +64,7 @@ return [
             'security' => [],
         ],
 
-        'generate_always' => true, // <-- Genera siempre para desarrollo
+        'generate_always' => true,
         'generate_yaml_copy' => false,
         'proxy' => false,
         'additional_config_url' => null,

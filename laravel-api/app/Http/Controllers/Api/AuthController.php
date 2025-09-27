@@ -11,7 +11,30 @@ use App\Models\Usuario;
 class AuthController extends Controller
 {
     /**
-     * Registro de un nuevo usuario
+     * @OA\Post(
+     *     path="/api/register",
+     *     tags={"Autenticación"},
+     *     summary="Registro de un nuevo usuario",
+     *     description="Crea un usuario y devuelve un token de acceso",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre","email","password","rol"},
+     *             @OA\Property(property="nombre", type="string", example="Juan Pérez"),
+     *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="123456"),
+     *             @OA\Property(property="rol", type="string", enum={"admin","usuario"}, example="usuario")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Usuario registrado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Errores de validación"
+     *     )
+     * )
      */
     public function register(Request $request)
     {
@@ -25,7 +48,6 @@ class AuthController extends Controller
         $validated['password'] = Hash::make($validated['password']);
         $usuario = Usuario::create($validated);
 
-        // Generar token
         $token = $usuario->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -36,7 +58,28 @@ class AuthController extends Controller
     }
 
     /**
-     * Login de usuario existente
+     * @OA\Post(
+     *     path="/api/login",
+     *     tags={"Autenticación"},
+     *     summary="Login de usuario existente",
+     *     description="Valida las credenciales y devuelve un token",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="123456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login exitoso"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Credenciales inválidas"
+     *     )
+     * )
      */
     public function login(Request $request)
     {
@@ -53,7 +96,6 @@ class AuthController extends Controller
             ]);
         }
 
-        // Generar token
         $token = $usuario->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -64,7 +106,21 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout (revocar tokens)
+     * @OA\Post(
+     *     path="/api/logout",
+     *     tags={"Autenticación"},
+     *     summary="Logout de usuario",
+     *     description="Revoca todos los tokens del usuario autenticado",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout exitoso, tokens revocados"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autorizado"
+     *     )
+     * )
      */
     public function logout(Request $request)
     {
