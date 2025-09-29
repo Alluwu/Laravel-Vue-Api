@@ -5,6 +5,7 @@
       :headers="headers"
       :loading="loading"
       class="elevation-1"
+      item-key="id"                
     >
       <template #no-data>
         <div class="pa-6 text-center">No hay usuarios para mostrar.</div>
@@ -35,7 +36,7 @@
       </template>
     </v-data-table>
 
-    <!-- Diálogo: Confirmar eliminación -->
+
     <v-dialog v-model="deleteDialog" max-width="460">
       <v-card>
         <v-card-title class="text-h6">
@@ -68,7 +69,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo: Editar usuario -->
+
     <v-dialog v-model="editDialog" max-width="560">
       <v-card>
         <v-card-title class="text-h6">
@@ -158,7 +159,7 @@ const headers: TableHeader[] = [
   { title: 'Acciones', key: 'acciones', sortable: false, align: 'end' },
 ]
 
-
+// Carga desde API
 const fetchUsers = async () => {
   loading.value = true
   try {
@@ -171,6 +172,7 @@ const fetchUsers = async () => {
 
 onMounted(fetchUsers)
 
+
 const filtered = computed(() => {
   const q = (props.searchTerm || '').toLowerCase().trim()
   if (!q) return items.value
@@ -181,7 +183,7 @@ const filtered = computed(() => {
   )
 })
 
-// ====== Eliminar ======
+
 const deleteDialog = ref(false)
 const deleteLoading = ref(false)
 const deleteError = ref('')
@@ -206,7 +208,13 @@ async function confirmDelete() {
   deleteError.value = ''
   try {
     await api.delete(`/usuarios/deleteUser/${selectedUser.value.id}`)
-    await fetchUsers()
+
+   
+    const removedId = selectedUser.value.id
+    items.value = items.value.filter(u => u.id !== removedId)
+
+  
+
     closeDelete()
   } catch (e: any) {
     deleteError.value = e?.response?.data?.message || e?.message || 'No se pudo eliminar'
@@ -214,7 +222,7 @@ async function confirmDelete() {
   }
 }
 
-// ====== Editar ======
+
 const editDialog = ref(false)
 const editLoading = ref(false)
 const editError = ref('')
@@ -232,7 +240,7 @@ const editForm = ref<{
   id: null,
   nombre: '',
   email: '',
-  rol: null,                       
+  rol: null,                        
   password: '',
 })
 
@@ -270,12 +278,24 @@ async function submitEdit() {
 
   try {
     await api.put(`/usuarios/updateUser/${editForm.value.id}`, payload)
-    await fetchUsers()
+
+ 
+    const idx = items.value.findIndex(u => u.id === editForm.value.id)
+    if (idx !== -1) {
+      items.value[idx] = {
+        ...items.value[idx],
+        nombre: editForm.value.nombre,
+        email: editForm.value.email,
+        rol: (editForm.value.rol ?? items.value[idx].rol) as 'admin'|'usuario',
+      }
+
+      items.value = [...items.value]
+    }
+
     closeEdit()
   } catch (e: any) {
     const res = e?.response
     if (res?.status === 422 || res?.status === 400) {
-  
       const errorsObj = res?.data?.errors as Record<string, string[]> | undefined
       const firstMsg = errorsObj ? Object.values(errorsObj)[0]?.[0] : undefined
       editError.value = res?.data?.message || firstMsg || 'Error de validación'
