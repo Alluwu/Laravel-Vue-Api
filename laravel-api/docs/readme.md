@@ -3,12 +3,12 @@
 Este proyecto implementa un sistema de autenticación y gestión de usuarios con soporte **multitenant**.  
 Está construido con **Laravel 10**, **Sanctum** para autenticación con tokens, **PostgreSQL** como base de datos, y un frontend en **Vue 3 + Vuetify**.
 
----
+
 
 ## 🎯 Objetivo
 Permitir gestionar usuarios (crear, listar, actualizar, eliminar) bajo un esquema multiempresa, con autenticación vía API y un frontend moderno.
 
----
+
 
 ## 🚀 Tecnologías
 - **Backend:** Laravel 10
@@ -16,7 +16,7 @@ Permitir gestionar usuarios (crear, listar, actualizar, eliminar) bajo un esquem
 - **Base de datos:** PostgreSQL
 - **Autenticación:** Laravel Sanctum
 
----
+
 
 ## ⚙️ Requisitos
 - PHP ^8.1
@@ -24,7 +24,7 @@ Permitir gestionar usuarios (crear, listar, actualizar, eliminar) bajo un esquem
 - Node.js + npm
 - PostgreSQL
 
----
+
 
 ## 🛠️ Instalación
 

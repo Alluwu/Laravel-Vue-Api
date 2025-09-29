@@ -7,16 +7,15 @@ use App\Http\Controllers\Api\AuthController;
 
 
 
-// --- AUTH PÚBLICO (SIN TENANT) ---
-Route::post('/login',    [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::middleware('tenant')->group(function () {
+    Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+});
 
-// --- RUTAS PROTEGIDAS (TENANT + SANCTUM) ---
 
 Route::middleware(['tenant','auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
-
 
 Route::middleware(['tenant','auth:sanctum'])->post('/logout', [AuthController::class, 'logout']);
 

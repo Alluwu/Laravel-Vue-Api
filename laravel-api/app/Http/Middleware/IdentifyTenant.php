@@ -2,48 +2,56 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class IdentifyTenant
 {
     public function handle(Request $request, Closure $next)
     {
     
-        $hostHeader = $request->header('host') ?? $request->getHost();
-        $host = explode(':', $hostHeader)[0]; // quita el puerto si viene
-
+        $host  = $request->getHost();        
         $parts = explode('.', $host);
-        $subdomain = null;
+        $subdomain = $parts[0] ?? null;
 
-        if (count($parts) >= 2) {
-
-            $subdomain = $parts[0];
+        if (!$subdomain || $subdomain === 'www' || $subdomain === 'localhost') {
+  
+            $subdomain = $request->header('X-Tenant-Subdomain') ?: $subdomain;
         }
 
-        if (!$subdomain || in_array(strtolower($subdomain), ['www'])) {
-            throw new NotFoundHttpException('Tenant no encontrado (subdominio ausente).');
+        if (!$subdomain) {
+            throw new HttpException(404, 'No se pudo determinar el subdominio del tenant.');
         }
 
-
-        $tenant = Tenant::where('subdomain', $subdomain)->first();
+        $tenant = DB::table('tenants')->where('subdomain', $subdomain)->first();
         if (!$tenant) {
-            throw new NotFoundHttpException("Tenant '{$subdomain}' no existe.");
+            throw new HttpException(404, 'Tenant no encontrado para subdominio: ' . $subdomain);
         }
 
 
-        $schema = preg_replace('/[^a-zA-Z0-9_]/', '', $tenant->schema);
-        if ($schema === '') {
-            throw new NotFoundHttpException('Schema inválido.');
+        $schema = $tenant->schema;
+
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $schema)) {
+            throw new HttpException(400, 'Nombre de schema inválido.');
         }
 
-        DB::purge(); 
-        DB::connection()->statement("SET search_path TO {$schema}, public");
+       
+        $quotedSchema = '"' . str_replace('"', '""', $schema) . '"';
+        $searchPath = ($schema === 'public') ? 'public' : ($quotedSchema . ',public');
 
-        app()->instance('tenant', $tenant);
+     
+        Config::set('database.connections.pgsql.schema', $schema === 'public' ? 'public' : $schema . ',public');
+        DB::purge('pgsql');
+        DB::reconnect('pgsql');
+
+
+        DB::statement('SET search_path TO ' . $searchPath);
+
+       
+        app()->instance('tenant.current', $tenant);
 
         return $next($request);
     }
